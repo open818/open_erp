@@ -40,7 +40,7 @@ VALUES
 (0, 0, 142, null, 118, '2', str_to_date('02-01-2000 16:00:00', '%d-%m-%Y %H:%i:%s'), 0, 'Accounting Element', 'D', '', '', 'Y', 'N', 'Y', 'N', 'N', 'N', 80, 'Element', null, null, 'L', 'C_Element', str_to_date('21-11-2005 08:11:42', '%d-%m-%Y %H:%i:%s'), 0),
 (0, 0, 145, null, 117, '2', str_to_date('02-01-2000 16:00:00', '%d-%m-%Y %H:%i:%s'), 0, 'Period of the Calendar', 'D', '', '', 'Y', 'N', 'N', 'N', 'N', 'N', 120, 'Period', null, null, 'L', 'C_Period', str_to_date('02-01-2000 16:00:00', '%d-%m-%Y %H:%i:%s'), 0);
 
-
+ 
 insert into ad_window (AD_CLIENT_ID, AD_COLOR_ID, AD_CTXAREA_ID, AD_IMAGE_ID, AD_ORG_ID, AD_WINDOW_ID, CREATED, CREATEDBY, DESCRIPTION, ENTITYTYPE, HELP, ISACTIVE, ISBETAFUNCTIONALITY, ISCUSTOMDEFAULT, ISDEFAULT, NAME, PROCESSING, UPDATED, UPDATEDBY, WINDOWTYPE)
 values (0, null, null, null, 0, 100, str_to_date('02-01-2000 16:00:00', '%d-%m-%Y %H:%i:%s'), 0, 'Maintain Tables and Columns', 'D', 'The Table and Column Window defines all tables with their columns', 'Y', 'N', 'N', 'N', 'Table and Column', 'N', str_to_date('02-01-2000 16:00:00', '%d-%m-%Y %H:%i:%s'), 0, 'M');
 

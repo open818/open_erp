@@ -79,6 +79,8 @@ class CreateUsersTable extends Migration
             $table->char('PROCESSING', 1)->default('N');
             $table->dateTime('UPDATED');
             $table->integer('UPDATEDBY')->default('0');
+            $table->integer('WINHEIGHT')->default('0');
+            $table->integer('WINWIDTH')->default('0');
             $table->char('WINDOWTYPE',1)->default('M');
         });
 
@@ -225,6 +227,7 @@ class CreateUsersTable extends Migration
         Schema::create('AD_COLUMN', function (Blueprint $table) {
             $table->integer('AD_CLIENT_ID');
             $table->increments('AD_COLUMN_ID');
+            $table->integer('AD_ELEMENT_ID')->nullable();
             $table->integer('AD_ORG_ID');
             $table->integer('AD_PROCESS_ID')->nullable();
             $table->integer('AD_REFERENCE_ID');

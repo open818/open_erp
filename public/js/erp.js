@@ -32,10 +32,10 @@ var ADWindow =
     },
 
     reload : function(select_kv){
-        table_id = this.currTab().table_id;
+        tab = this.currTab().table_id;
 
         $('#table_' + table_id).setGridParam({
-            url: '/_develop/getTableDate/'+table_id,
+            url: '/_develop/getTableDate/'+tab.tab_id+'/'+tab.table_id,
             postData: select_kv,
             datatype:'json'
         }).trigger("reloadGrid");

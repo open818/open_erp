@@ -120,12 +120,8 @@ class CreateModels
             $tab->fields = $fields;
 
             //获取tab对应表的主键列
-            $id_column = \DB::table('ad_column')->where('AD_TABLE_ID', $tab->AD_TAB_ID)->where('ISKEY','Y')->get();
-            if(count($id_column) == 1){
-                $tab->id_name = $id_column[0]->COLUMNNAME;
-            }else{
-                $tab->id_name = '';
-            }
+            $table = \DB::table('ad_table')->where('AD_TABLE_ID', $tab->AD_TAB_ID)->first();
+            $tab->id_name = strtoupper($table->TABLENAME).'_ID';
 
             //获取tab对应表的父表关联列
             $p_columns = \DB::table('ad_column')->where('ad_table_id', $tab->AD_TAB_ID)->where('ISPARENT','Y')->lists('COLUMNNAME');
@@ -135,24 +131,36 @@ class CreateModels
         return view('layout.window',['window'=>$window, 'tabs'=>$tabs]);
     }
 
-    public static function getTableDate($table_id){
-        $table = \DB::table('ad_table')->where('ad_table_id', $table_id)->first();
-        $p_columns = \DB::table('ad_column')->where('ad_table_id', $table_id)->where('ISPARENT','Y')->get();
+    public static function getTableDate($tab_id, $table_id){
+        $tab = DB::table('ad_tab')->where('ad_tab_id', $tab_id)->first();
+        $table = DB::table('ad_table')->where('ad_table_id', $table_id)->first();
+
+        $builder = DB::table($table->TABLENAME);
+
+        //获取父表关联列
+        $p_columns = DB::table('ad_column')->where('ad_table_id', $table_id)->where('ISPARENT','Y')->get();
         $params = request()->all();
         if($p_columns){
-            $builder = \DB::table($table->TABLENAME);
+            //如果存在父表关联列，带入关联列参数
             foreach($p_columns as $p){
-                if(!isset($params[$p->COLUMNNAME])){
+                if(!isset($params[strtoupper($p->COLUMNNAME)])){
                     return json_encode([]);
                 }
-
-                $builder = $builder->where($p->COLUMNNAME, $params[$p->COLUMNNAME]);
+                $builder = $builder->where(strtoupper($p->COLUMNNAME), $params[strtoupper($p->COLUMNNAME)]);
             }
-            $table_datas = $builder->get();
-        }else{
-            $table_datas = \DB::table($table->TABLENAME)->get();
         }
 
+        //如果tab的SQL Where子句不为空，则添加
+        if(!empty($tab->WHERECLAUSE)){
+            $builder->whereRaw($tab->WHERECLAUSE);
+        }
+
+        //如果tab的SQL OrderBy子句不为空，则添加,否则默认ID倒序
+        if(!empty($tab->ORDERBYCLAUSE)){
+            $builder->orderByRaw($tab->ORDERBYCLAUSE);
+        }
+
+        $table_datas = $builder->get();
         return json_encode($table_datas);
     }
 
@@ -167,10 +175,11 @@ class CreateModels
         $fields = \DB::table('ad_field')
             ->join('ad_column', 'ad_field.AD_COLUMN_ID', '=', 'ad_column.AD_COLUMN_ID')
             ->where('ad_tab_id', $tab_id)->where('ad_field.ISACTIVE', 'Y')->where('ad_field.ISDISPLAYED','Y')
-            ->orderBy('ad_field.SEQNO')->get(['ad_field.*','ad_column.COLUMNNAME']);
+            ->orderBy('ad_field.SEQNO')->get(['ad_field.*','ad_column.AD_REFERENCE_ID','ad_column.COLUMNNAME']);
         //dd($table_datas);
         $view = view('layout.window_edit', ['table_id'=>$tab->AD_TABLE_ID, 'record_id'=>$record_id,'fields'=>$fields, 'table_datas'=>$table_datas]);
-        return htmlspecialchars_decode((string)$view);
+        return $view;
+        //return htmlspecialchars_decode((string)$view);
     }
 
     public function saveEdit(){
@@ -182,6 +191,8 @@ class CreateModels
         if($record_id > 0){
             //修改数据
             foreach($columns as $column){
+                $column->COLUMNNAME = strtoupper($column->COLUMNNAME);
+
                 if(!empty($column->COLUMNSQL) || $column->ISUPDATEABLE == 'N'){
                     //虚拟列、不可修改列、ID列
                     continue;
@@ -201,10 +212,12 @@ class CreateModels
             if($column->COLUMNNAME == 'UPDATED' && !isset($data[$column->COLUMNNAME])){
                 $data[$column->COLUMNNAME] = Carbon::now();
             }
-            DB::table($table->TABLENAME)->where($table->TABLENAME.'_ID', $record_id)->update($data);
+            DB::table($table->TABLENAME)->where(strtoupper($table->TABLENAME).'_ID', $record_id)->update($data);
         }else{
             //新增数据
             foreach($columns as $column){
+                $column->COLUMNNAME = strtoupper($column->COLUMNNAME);
+
                 if(!empty($column->COLUMNSQL) || $column->ISUPDATEABLE == 'N'){
                     //虚拟列、不可修改列、ID列
                     continue;

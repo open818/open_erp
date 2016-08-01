@@ -31,8 +31,8 @@ Route::get('_develop/showWindow/{window_id}', function ($window_id) {
     return (new \App\Http\Core\CreateModels())->showWindow($window_id);
 });
 
-Route::get('_develop/getTableDate/{table_id}/{parent_id?}', function ($table_id, $parent_id=0) {
-    return (new \App\Http\Core\CreateModels())->getTableDate($table_id, $parent_id);
+Route::get('_develop/getTableDate/{tab_id}/{table_id}', function ($tab_id, $table_id) {
+    return (new \App\Http\Core\CreateModels())->getTableDate($tab_id, $table_id);
 });
 
 Route::get('_develop/edit/{table_id}/{record_id?}', function ($table_id, $record_id=0) {

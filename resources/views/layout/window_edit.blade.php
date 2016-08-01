@@ -49,30 +49,33 @@
         padding:0 10px;
         border: 0;
     }
-    .edit_window .row{
+    .edit_window tr{
         margin:10px;
     }
 
-    .edit_window .row label{
+    .edit_window tr td{
+        padding: 5px 5px;
+    }
+
+    .edit_window tr label{
         height:20px;
         font-size:12px;
         line-height:15px;
         margin:0 5px;
+        float : right;
     }
 
-    input.txt{
+    .txt{
         background-color:#F9EE70;
         color:#333;
-        width:150px;
-        height:20px;
-        margin:0 10px;
+        width: 100%;
         font-size:16px;
         line-height:20px;
         border:none;
         border-bottom:1px solid #565656;
     }
 
-    input.txt:focus{
+    .txt:focus{
         color:#333;
         background-color: #FF0;
         border-bottom:1px solid #F00;
@@ -106,34 +109,28 @@
     {!! Form::hidden('record_id', $record_id) !!}
     <fieldset>
         <legend>收件信息</legend>
-        <div class="row">
+        <table>
+            <tr>
             @php($i = 1)
             @foreach($fields as $field)
-
-            @if($field->ISSAMELINE=='N' && $i != 1 && $i != count($fields))
-            </div><div class = "row">
-            @endif
-
-            {!! Form::label($field->COLUMNNAME, $field->NAME) !!}
-            @if($record_id)
-                @php($column_name=$field->COLUMNNAME)
-                @if($field->ISMANDATORYUI == 'Y')
-                {!! Form::text($field->COLUMNNAME, $table_datas->$column_name, ['class' => 'txt', 'required'=>'true']) !!}
-                @else
-                    {!! Form::text($field->COLUMNNAME, $table_datas->$column_name, ['class' => 'txt']) !!}
-                @endif
-            @else
-                @if($field->ISMANDATORYUI == 'Y')
-                    {!! Form::text($field->COLUMNNAME, null, ['class' => 'txt', 'required'=>'true']) !!}
-                @else
-                    {!! Form::text($field->COLUMNNAME, null, ['class' => 'txt']) !!}
+                @if($field->ISSAMELINE=='N' && $i != 1)
+                </tr><tr>
                 @endif
 
-            @endif
+                @if($record_id)
+                    @php($column_name=strtoupper($field->COLUMNNAME))
+                    @php($field_value=$table_datas->$column_name)
+                @else
+                    @php($field_value=null)
+                @endif
 
-            @php($i++)
+                {!! \App\Http\Core\ReferenceHelp::htmlTag($field->AD_FIELD_ID, $field_value) !!}
+
+                @php($i++)
             @endforeach
-        </div>
+            </tr>
+        </table>
+
     </fieldset>
 
     {!! Form::close() !!}
